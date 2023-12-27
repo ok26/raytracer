@@ -1,11 +1,11 @@
-use crate::{util::vector::Vec3, ray::{Ray, Interval}, bvh::aabb::AABB};
+use crate::{util::{vector::Vec3, matrix::Mat3}, ray::{Ray, Interval}, bvh::aabb::AABB};
 use super::{hittable::{Hittable, HitRecord}, material::Material};
 
 #[derive(Clone)]
 pub struct Triangle {
-    a: Vec3,
-    b: Vec3,
-    c: Vec3,
+    pub a: Vec3,
+    pub b: Vec3,
+    pub c: Vec3,
     normal: Vec3,
     bbox: AABB,
     material: Material
@@ -13,6 +13,21 @@ pub struct Triangle {
 
 impl Triangle {
     pub fn new(a: Vec3, b: Vec3, c: Vec3, material: Material) -> Triangle {
+        Triangle {
+            a,
+            b,
+            c,
+            bbox: Self::bbox(a, b, c),
+            normal: Self::normal(a, b, c),
+            material
+        }
+    }
+
+    pub fn normal(a: Vec3, b: Vec3, c: Vec3) -> Vec3 {
+        (b - a).cross(c - a).normalized()
+    }
+
+    pub fn bbox(a: Vec3, b: Vec3, c: Vec3) -> AABB {
         let mut x = Interval::rev();
         let mut y = Interval::rev();
         let mut z = Interval::rev();
@@ -21,25 +36,43 @@ impl Triangle {
             y.min = f64::min(y.min, vec.get(1));
             z.min = f64::min(z.min, vec.get(2));
 
-            x.max = f64::min(x.max, vec.get(0));
-            y.max = f64::min(y.max, vec.get(1));
-            z.max = f64::min(z.max, vec.get(2));
+            x.max = f64::max(x.max, vec.get(0));
+            y.max = f64::max(y.max, vec.get(1));
+            z.max = f64::max(z.max, vec.get(2));
         }
-
-        Triangle {
-            a,
-            b,
-            c,
-            bbox: AABB::new(x, y, z),
-            normal: (b - a).cross(c - a).normalized(),
-            material
-        }
+        if x.min == x.max { x.expand(1e-6) }
+        if y.min == y.max { y.expand(1e-6) }
+        if z.min == z.max { z.expand(1e-6) }
+        AABB::new(x, y, z)
     }
 
     pub fn mv(&mut self, delta_pos: Vec3) {
         self.a = self.a + delta_pos;
         self.b = self.b + delta_pos;
         self.c = self.c + delta_pos;
+        self.bbox = Self::bbox(self.a, self.b, self.c);
+        self.normal = Self::normal(self.a, self.b, self.c);
+    }
+
+    pub fn rotate(&mut self, degrees: Vec3) {
+        for axis in 0..3 {
+            if degrees.get(axis) != 0.0 {
+                let rot_matrix = Mat3::rot_matrix(degrees.get(axis), axis);
+                self.a = rot_matrix * self.a;
+                self.b = rot_matrix * self.b;
+                self.c = rot_matrix * self.c;
+            }
+        }
+        self.bbox = Self::bbox(self.a, self.b, self.c);
+        self.normal = Self::normal(self.a, self.b, self.c);
+    }
+
+    pub fn scale(&mut self, scale: f64) {
+        self.a = self.a * scale;
+        self.b = self.b * scale;
+        self.c = self.c * scale;
+        self.bbox = Self::bbox(self.a, self.b, self.c);
+        self.normal = Self::normal(self.a, self.b, self.c);
     }
 
     pub fn set_material(&mut self, material: Material) {

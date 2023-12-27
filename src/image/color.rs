@@ -5,6 +5,21 @@ pub struct Color {
     pub b: f64
 }
 
+impl Color {
+    pub fn new(r: f64, g: f64, b: f64) -> Color {
+        Color { r, g, b }
+    }
+
+    pub fn blank() -> Color {
+        Color::new(0.0, 0.0, 0.0)
+    }
+
+    pub fn white() -> Color {
+        Color::new(1.0, 1.0, 1.0)
+    }
+}
+
+
 impl std::ops::Add for Color {
     type Output = Color;
 
@@ -62,20 +77,6 @@ impl std::ops::Div<f64> for Color {
             g: self.g / rhs,
             b: self.b / rhs
         }
-    }
-}
-
-impl Color {
-    pub fn new(r: f64, g: f64, b: f64) -> Color {
-        Color { r, g, b }
-    }
-
-    pub fn blank() -> Color {
-        Color::new(0.0, 0.0, 0.0)
-    }
-
-    pub fn white() -> Color {
-        Color::new(1.0, 1.0, 1.0)
     }
 }
 

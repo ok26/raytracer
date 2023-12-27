@@ -30,29 +30,27 @@ impl Interval {
 
     pub fn standard() -> Interval {
         Interval {
-            min: 1e-6,
-            max: 1e3
+            min: 0.001,
+            max: 1e9
         }
     }
 
     pub fn max() -> Interval {
         Interval {
-            min: -1e6,
-            max:  1e6
+            min: -1e9,
+            max:  1e9
         }
     }
 
     pub fn rev() -> Interval {
         Interval {
-            min:  1e6,
-            max: -1e6
+            min:  1e9,
+            max: -1e9
         }
     }
 
-    pub fn expand(&self, delta: f64) -> Interval {
-        Interval {
-            min: self.min - delta / 2.0,
-            max: self.max + delta / 2.0
-        }
+    pub fn expand(&mut self, delta: f64) {
+        self.min = self.min - delta / 2.0;
+        self.max = self.max + delta / 2.0;
     }
 }

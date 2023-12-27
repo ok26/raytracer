@@ -1,19 +1,21 @@
-use crate::image::color;
-use crate::objects::hittable::{Hittable, HitRecord};
-use crate::camera::Camera;
-use crate::image::{image::Image, color::Color};
-use crate::ray::{Ray, Interval};
-use crate::util::random::Random;
-use crate::util::vector;
+use crate::{
+    image::color,
+    objects::hittable::{Hittable, HitRecord},
+    camera::Camera,
+    image::{image::Image, color::Color},
+    ray::{Ray, Interval},
+    util::random::Random,
+    util::vector
+};
 
-pub struct Scene<'a> {
-    objects: Vec<&'a dyn Hittable>,
+pub struct Scene {
+    objects: Vec<Box<dyn Hittable>>,
     camera: Camera,
     sun_strength: f64
 }
 
-impl<'a> Scene<'a> {
-    pub fn new(camera: Camera, sun_strength: f64) -> Scene<'a> {
+impl Scene {
+    pub fn new(camera: Camera, sun_strength: f64) -> Scene {
         Scene {
             objects: vec![],
             camera,
@@ -21,7 +23,7 @@ impl<'a> Scene<'a> {
         }
     }
 
-    pub fn add_object(&mut self, object: &'a dyn Hittable) {
+    pub fn add_object(&mut self, object: Box<dyn Hittable>) {
         self.objects.push(object);
     }
 
@@ -72,7 +74,6 @@ impl<'a> Scene<'a> {
     pub fn render(&mut self, camera: &Camera, bounce_count: usize, ray_count: usize) -> Image {
         let mut image = Image::new(camera.image_width(), camera.image_height());
         for y in 0..camera.image_height() {
-            println!("{}", y);
             for x in 0..camera.image_width() {
 
                 let mut average_color = Color::blank();
@@ -94,9 +95,7 @@ impl<'a> Scene<'a> {
                 }
                 image.set(x, y, color::linear_to_gamma(average_color / ray_count as f64));
             }
-            if y % 100 == 0 {
-                println!("{}", y);
-            }
+            println!("{}", y);
         }
         image
     }

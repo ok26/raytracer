@@ -14,9 +14,9 @@ impl AABB {
 
     pub fn standard() -> AABB {
         AABB {
-            x: Interval::standard(),
-            y: Interval::standard(),
-            z: Interval::standard()
+            x: Interval::max(),
+            y: Interval::max(),
+            z: Interval::max()
         }
     }
 
@@ -46,27 +46,31 @@ impl AABB {
     }
 
     pub fn hit(&self, ray: &Ray, interval: &Interval) -> bool {
+
+        let mut t_min = interval.min;
+        let mut t_max = interval.max;
+
         for a in 0..3 {
             let inv_d = 1.0 / ray.direction.get(a);
-            let mut t0 = (self.axis(a).min - ray.origin.get(a)) * inv_d;
-            let mut t1 = (self.axis(a).max - ray.origin.get(a)) * inv_d;
+            let origin = ray.origin.get(a);
+            let min = self.axis(a).min;
+            let max = self.axis(a).max;
 
-            if inv_d < 0.0 {
+            let mut t0 = (min - origin) * inv_d;
+            let mut t1 = (max - origin) * inv_d;
+
+            if inv_d < 0.0{
                 std::mem::swap(&mut t0, &mut t1);
             }
 
-            if t0 < interval.min {
-                t0 = interval.min;
-            }
-            if t1 > interval.max {
-                t1 = interval.max;
-            }
-            //println!("{}, {}, {}, {}, {}", t0, t1, interval.min, interval.max, inv_d);
-            if t1 <= t0 {
+            t_min = if t0 > t_min { t0 } else { t_min };
+            t_max = if t1 < t_max { t1 } else { t_max };
+            
+            if t_max <= t_min {
                 return false;
             }
         }
-        //println!("W");
+
         true
     }
 }
