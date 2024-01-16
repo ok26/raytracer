@@ -15,7 +15,7 @@ const FOCAL_LENGTH: f64 = 2.0;
 const MAX_BOUNCE_COUNT: usize = 10;
 const RAY_COUNT: usize = 1000;
 
-const SUN_STRENGTH: f64 = 0.6;
+const SUN_STRENGTH: f64 = 0.4;
 
 fn main() {
     let camera = Camera::new(
@@ -42,10 +42,20 @@ fn main() {
         Vec3::new([-20.0, 0.0, 0.0]),
         10.0,
         Material::new(
-            Color::new(0.9, 0.9, 0.9),
+            Color::new(0.7, 0.7, 0.7),
             Color::new(1.0, 1.0, 1.0),
-            1.0,
+            0.0,
             1.0
+    ))));
+
+    scene.add_object(Box::new(Sphere::new(
+        Vec3::new([-15.0, 20.0, 5.0]),
+        10.0,
+        Material::new(
+            Color::new(1.0, 1.0, 1.0),
+            Color::new(1.0, 1.0, 1.0),
+            2.0,
+            0.0
     ))));
 
     scene.add_object(Box::new(Sphere::new(
@@ -54,7 +64,7 @@ fn main() {
         Material::new(
             Color::new(0.8, 0.8, 0.0),
             Color::new(0.8, 0.8, 0.0),
-            0.8,
+            0.0,
             0.0
     ))));
     scene.add_object(Box::new(Sphere::new(
@@ -70,10 +80,10 @@ fn main() {
         Vec3::new([-4.0, 5.0, 3.0]),
         1.0,
         Material::new(
-            Color::new(0.9, 0.9, 0.9),
-            Color::new(1.0, 1.0, 1.0),
+            Color::new(0.0, 1.0, 0.0),
+            Color::new(0.1, 1.0, 0.1),
             0.0,
-            1.0
+            0.0
     ))));
     
     let image = scene.render(&camera, MAX_BOUNCE_COUNT, RAY_COUNT);

@@ -57,11 +57,8 @@ impl Scene {
 
     fn closest_hit(&self, ray: &Ray) -> Option<HitRecord> {
         let mut closest_hit: Option<HitRecord> = None;
-        let mut interval = Interval::standard();
+        let interval = Interval::standard();
         for i in 0..self.objects.len() {
-            if closest_hit.is_some() {
-                interval.max = closest_hit.unwrap().t;
-            }
             if let Some(hit_info) = self.objects[i].hit(&ray, &interval) {
                 if closest_hit.is_none() || hit_info.t < closest_hit.unwrap().t {
                     closest_hit = Some(hit_info);

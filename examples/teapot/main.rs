@@ -72,5 +72,5 @@ fn main() {
     ))));
    
     let image = scene.render(&camera, MAX_BOUNCE_COUNT, RAY_COUNT);
-    image.save_png("./examples/teapot/image2.png");
+    image.save_png("./examples/teapot/image.png");
 }
